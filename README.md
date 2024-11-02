@@ -11,5 +11,5 @@ Flask API for text generation using the Mistral-7B model on Hugging Face.
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/username/mistral-api.git
+   git clone git@github.com:ITech7750/mistral-api.git
    cd mistral-api
