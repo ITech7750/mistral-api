@@ -4,8 +4,8 @@ import torch
 
 # Инициализация модели и токенизатора
 try:
-    tokenizer = AutoTokenizer.from_pretrained("gpt2")
-    model = AutoModelForCausalLM.from_pretrained("gpt2")
+    tokenizer = AutoTokenizer.from_pretrained("microsoft/CodeGPT-small-py")  # или другой подходящий кодер
+    model = AutoModelForCausalLM.from_pretrained("microsoft/CodeGPT-small-py")
 except Exception as e:
     print(f"Ошибка при загрузке модели: {e}")
     model = None
@@ -35,6 +35,7 @@ def generate_text():
         if len(input_text) > 500:
             return jsonify({"error": "Слишком длинный текст, ограничение 500 символов"}), 400
 
+        # Параметры генерации, настроенные для кода
         inputs = tokenizer.encode(input_text, return_tensors="pt")
         attention_mask = torch.ones_like(inputs)
 
@@ -42,9 +43,12 @@ def generate_text():
             outputs = model.generate(
                 inputs,
                 attention_mask=attention_mask,
-                max_length=50,
+                max_length=200,  # Увеличенное значение для более длинного кода
                 num_return_sequences=1,
-                no_repeat_ngram_size=2,
+                no_repeat_ngram_size=3,
+                temperature=0.3,  # Низкая температура для уменьшения случайности
+                top_k=50,  # Ограничение на количество вероятных вариантов
+                top_p=0.95,  # Поддержка выборки на основе вероятности
                 pad_token_id=tokenizer.eos_token_id
             )
         
