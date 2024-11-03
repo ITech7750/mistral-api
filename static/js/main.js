@@ -1,22 +1,10 @@
-$(document).ready(function() {
-    $('#generateButton').click(function() {
-        const inputText = $('#inputText').val();
-        if (inputText.length > 500) {
-            $('#responseText').text("Input text is too long");
-            return;
-        }
-
-        $.ajax({
-            url: "/generate",
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify({ text: inputText }),
-            success: function(response) {
-                $('#responseText').text(response.response);
-            },
-            error: function(error) {
-                $('#responseText').text("An error occurred: " + error.responseJSON.error);
-            }
-        });
+async function generateText() {
+    const inputText = document.getElementById("user-input").value;
+    const response = await fetch("/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: inputText })
     });
-});
+    const data = await response.json();
+    document.getElementById("response").innerText = data.response;
+}

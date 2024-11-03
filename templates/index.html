@@ -3,27 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Text Generator</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-components-web/4.0.0/material-components-web.min.css" />
+    <title>Flask App with Model</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
-<body style="display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f0f2f5;">
-    <div style="width: 400px; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-        <h2 style="text-align: center;">Text Generator</h2>
-        <div class="mdc-text-field mdc-text-field--textarea">
-            <textarea id="inputText" class="mdc-text-field__input" rows="4" placeholder="Enter text here..."></textarea>
-        </div>
-        <button id="generateButton" class="mdc-button mdc-button--raised" style="width: 100%; margin-top: 16px;">
-            <span class="mdc-button__label">Generate</span>
-        </button>
-        <div id="response" style="margin-top: 20px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; background-color: #f9f9f9;">
-            <strong>Response:</strong>
-            <p id="responseText"></p>
-        </div>
-    </div>
+<body>
+    <h1>Flask API with Model</h1>
+    <input type="text" id="user-input" placeholder="Enter text here">
+    <button onclick="generateText()">Generate</button>
+    <p id="response"></p>
 
-    <!-- Material UI JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/material-components-web/4.0.0/material-components-web.min.js"></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
