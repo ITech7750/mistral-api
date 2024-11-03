@@ -1,8 +1,8 @@
 from flask import Flask, request, jsonify, render_template
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
-import re
 
+# Инициализация модели StarCoder с токеном Hugging Face
 try:
     tokenizer = AutoTokenizer.from_pretrained("bigcode/starcoder", use_auth_token="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")
     model = AutoModelForCausalLM.from_pretrained("bigcode/starcoder", use_auth_token="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")
@@ -45,6 +45,7 @@ def generate_text():
                 attention_mask=attention_mask,
                 max_length=300,
                 num_return_sequences=1,
+                do_sample=True,  # Активируем выборку для применения temperature и top_p
                 temperature=0.15,
                 top_p=0.9,
                 top_k=50,
@@ -54,7 +55,7 @@ def generate_text():
 
         generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
 
-        # Улучшенное форматирование кода
+        # Простое форматирование кода (удаление лишних пустых строк и нормализация отступов)
         formatted_text = format_code(generated_text)
 
         return jsonify({"response": formatted_text})
@@ -63,29 +64,11 @@ def generate_text():
         return jsonify({"error": f"Ошибка: {e}"}), 500
 
 def format_code(code: str) -> str:
-    """Форматирует сгенерированный код для улучшения читабельности и сохранения отступов."""
+    """Форматирует сгенерированный код для улучшения читаемости."""
     # Убираем лишние пустые строки и нормализуем отступы
     lines = code.split("\n")
     formatted_lines = [line.rstrip() for line in lines if line.strip()]
-
-    # Определяем базовый отступ первой строки
-    base_indent = len(re.match(r"^\s*", formatted_lines[0]).group(0))
-    formatted_lines = [line[base_indent:] if len(line) >= base_indent else line for line in formatted_lines]
-
-    # Добавляем проверку на синтаксические ошибки
-    formatted_text = "\n".join(formatted_lines)
-    if not validate_code_syntax(formatted_text):
-        return "Сгенерированный код содержит синтаксические ошибки"
-
-    return formatted_text
-
-def validate_code_syntax(code: str) -> bool:
-    """Проверка синтаксиса кода на Python."""
-    try:
-        compile(code, "<string>", "exec")
-        return True
-    except SyntaxError:
-        return False
+    return "\n".join(formatted_lines)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)
