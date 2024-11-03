@@ -5,23 +5,24 @@ import re
 import os
 
 # Установка токена аутентификации Hugging Face
-HUGGINGFACE_TOKEN = "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"
+HUGGINGFACE_TOKEN = os.getenv("HUGGINGFACE_TOKEN", "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")
 
 # Инициализация модели и токенизатора
 try:
     # Используем более мощную модель Code Llama, передавая токен аутентификации
     tokenizer = AutoTokenizer.from_pretrained(
         "meta-llama/CodeLlama-13b", 
-        use_auth_token=HUGGINGFACE_TOKEN
+        token=HUGGINGFACE_TOKEN  # Заменили use_auth_token на token
     )
     model = AutoModelForCausalLM.from_pretrained(
         "meta-llama/CodeLlama-13b", 
-        use_auth_token=HUGGINGFACE_TOKEN
+        token=HUGGINGFACE_TOKEN  # Заменили use_auth_token на token
     )
     model.to("cuda" if torch.cuda.is_available() else "cpu")
 except Exception as e:
     print(f"Ошибка при загрузке модели: {e}")
     model = None
+
 
 app = Flask(__name__)
 
