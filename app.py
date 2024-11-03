@@ -3,10 +3,9 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 import re
 
-# Инициализация модели StarCoder
 try:
-    tokenizer = AutoTokenizer.from_pretrained("bigcode/starcoder")  # Мощная модель для генерации кода
-    model = AutoModelForCausalLM.from_pretrained("bigcode/starcoder")
+    tokenizer = AutoTokenizer.from_pretrained("bigcode/starcoder", use_auth_token="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")
+    model = AutoModelForCausalLM.from_pretrained("bigcode/starcoder", use_auth_token="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")
 except Exception as e:
     print(f"Ошибка при загрузке модели: {e}")
     model = None
@@ -46,7 +45,7 @@ def generate_text():
                 attention_mask=attention_mask,
                 max_length=300,
                 num_return_sequences=1,
-                temperature=0.15,  # Очень низкая температура для точного кода
+                temperature=0.15,
                 top_p=0.9,
                 top_k=50,
                 no_repeat_ngram_size=3,
