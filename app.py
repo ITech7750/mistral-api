@@ -1,64 +1,54 @@
-from flask import Flask, request, jsonify
-import os
-import torch
+from flask import Flask, request, jsonify, render_template
 from transformers import AutoTokenizer, AutoModelForCausalLM
-from dotenv import load_dotenv
-import gc
+import torch
 
-# Загрузите токен из .env или переменной окружения
-load_dotenv()
-hf_token = os.getenv("HUGGINGFACE_TOKEN", "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")
+# Инициализация модели и токенизатора
+try:
+    tokenizer = AutoTokenizer.from_pretrained("gpt2")
+    model = AutoModelForCausalLM.from_pretrained("gpt2")
+except Exception as e:
+    print(f"Ошибка при загрузке модели: {e}")
+    raise
 
 app = Flask(__name__)
 
-# Имя модели
-model_name = "mistralai/Mistral-7B-v0.1"
+# Главная страница с интерфейсом
+@app.route("/", methods=["GET"])
+def index():
+    return render_template("index.html")
 
-# Проверка доступности CUDA
-device = "cuda" if torch.cuda.is_available() else "cpu"
+# Тестовый эндпоинт
+@app.route("/test", methods=["GET"])
+def test():
+    return jsonify({"message": "Server is running"}), 200
 
-# Загрузка токенизатора
-tokenizer = AutoTokenizer.from_pretrained(model_name, token=hf_token)
-
-# Загрузка модели с оптимизацией под float16, если доступен CUDA
-model = AutoModelForCausalLM.from_pretrained(
-    model_name,
-    device_map="auto" if device == "cuda" else None,
-    torch_dtype=torch.float16 if device == "cuda" else torch.float32,
-    token=hf_token
-)
-
-# Перемещение модели на нужное устройство
-model.to(device)
-
-# API для генерации текста
+# Эндпоинт для генерации текста
 @app.route("/generate", methods=["POST"])
-def generate():
-    data = request.json
-    prompt = data.get("prompt", "")
-    max_length = data.get("max_length", 50)  # Ограничим длину вывода для экономии памяти
+def generate_text():
+    try:
+        data = request.get_json()
+        input_text = data.get("text", "")
+        if len(input_text) > 500:
+            return jsonify({"error": "Input text is too long"}), 400
+        inputs = tokenizer.encode(input_text, return_tensors="pt")
+        attention_mask = torch.ones_like(inputs)
 
-    # Подготовка ввода для модели
-    inputs = tokenizer(prompt, return_tensors="pt").to(device)
+        with torch.no_grad():
+            outputs = model.generate(
+                inputs,
+                attention_mask=attention_mask,
+                max_length=50,
+                num_return_sequences=1,
+                no_repeat_ngram_size=2,
+                pad_token_id=tokenizer.eos_token_id
+            )
+        
+        generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+        
+        return jsonify({"response": generated_text})
 
-    # Очистка кэша GPU и сборка мусора для освобождения памяти
-    if device == "cuda":
-        torch.cuda.empty_cache()
-        gc.collect()
-
-    # Генерация текста с моделью
-    with torch.no_grad():  # Отключаем автодифференцирование для экономии памяти
-        outputs = model.generate(
-            inputs["input_ids"],
-            max_length=max_length,
-            temperature=0.7,
-            top_p=0.9,
-            do_sample=True
-        )
-
-    # Декодирование и возврат результата
-    response_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    return jsonify({"response": response_text})
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {e}"}), 500
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=8000)
