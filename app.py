@@ -5,7 +5,7 @@ import re
 import os
 
 # Установка токена аутентификации Hugging Face
-HUGGINGFACE_TOKEN = os.getenv("HUGGINGFACE_TOKEN", "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")
+HUGGINGFACE_TOKEN = os.getenv("HUGGINGFACE_TOKEN", "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")
 
 # Инициализация модели и токенизатора
 try:
