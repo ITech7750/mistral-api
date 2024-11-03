@@ -2,12 +2,23 @@ from flask import Flask, request, jsonify, render_template
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 import re
+import os
+
+# Установка токена аутентификации Hugging Face
+HUGGINGFACE_TOKEN = "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"
 
 # Инициализация модели и токенизатора
 try:
-    # Используем более крупную и качественную модель CodeGen
-    tokenizer = AutoTokenizer.from_pretrained("Salesforce/codegen-2B-multi")  
-    model = AutoModelForCausalLM.from_pretrained("Salesforce/codegen-2B-multi")
+    # Используем более мощную модель Code Llama, передавая токен аутентификации
+    tokenizer = AutoTokenizer.from_pretrained(
+        "meta-llama/CodeLlama-13b", 
+        use_auth_token=HUGGINGFACE_TOKEN
+    )
+    model = AutoModelForCausalLM.from_pretrained(
+        "meta-llama/CodeLlama-13b", 
+        use_auth_token=HUGGINGFACE_TOKEN
+    )
+    model.to("cuda" if torch.cuda.is_available() else "cpu")
 except Exception as e:
     print(f"Ошибка при загрузке модели: {e}")
     model = None
@@ -38,7 +49,7 @@ def generate_text():
             return jsonify({"error": "Слишком длинный текст, ограничение 500 символов"}), 400
 
         # Подготовка данных для генерации
-        inputs = tokenizer.encode(input_text, return_tensors="pt")
+        inputs = tokenizer.encode(input_text, return_tensors="pt").to("cuda" if torch.cuda.is_available() else "cpu")
         attention_mask = torch.ones_like(inputs)
 
         with torch.no_grad():
@@ -66,16 +77,13 @@ def generate_text():
 
 def format_code(code: str) -> str:
     """Форматирует сгенерированный код для улучшения читабельности и сохранения отступов."""
-    # Удаляем лишние пустые строки и нормализуем отступы
     lines = code.strip().split("\n")
     formatted_lines = [line.rstrip() for line in lines if line.strip()]
 
-    # Определяем базовый отступ первой строки
     base_indent = len(re.match(r"^\s*", formatted_lines[0]).group(0))
     formatted_lines = [line[base_indent:] if len(line) >= base_indent else line for line in formatted_lines]
 
     return "\n".join(formatted_lines)
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)

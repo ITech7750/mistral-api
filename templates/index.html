@@ -26,6 +26,7 @@
             <option value="javascript">JavaScript</option>
             <option value="java">Java</option>
             <option value="kotlin">Kotlin</option>
+            <option value="cpp">C++</option>
         </select>
 
         <button id="generateButton" class="mdc-button mdc-button--raised" style="width: 100%; margin-top: 16px;">
@@ -51,5 +52,23 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-javascript.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-java.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-kotlin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-cpp.min.js"></script>
+
+    <script>
+        document.getElementById("generateButton").addEventListener("click", function() {
+            const inputText = document.getElementById("inputText").value;
+            const language = document.getElementById("languageSelect").value;
+            const responseElement = document.getElementById("response");
+            const responseTextElement = document.getElementById("responseText");
+
+            // Очистка предыдущего результата и установка языка
+            responseTextElement.className = `language-${language}`;
+            responseTextElement.textContent = inputText; // Пример вывода, замените на сгенерированный текст
+
+            // Вызов Prism.js для подсветки синтаксиса
+            Prism.highlightElement(responseTextElement);
+            responseElement.style.display = "block";
+        });
+    </script>
 </body>
 </html>
