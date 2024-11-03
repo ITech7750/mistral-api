@@ -3,10 +3,10 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 import re
 
-# Инициализация более мощной модели CodeGen 6B
+# Инициализация модели StarCoder
 try:
-    tokenizer = AutoTokenizer.from_pretrained("Salesforce/codegen-6B-multi")  # Мощная модель для генерации кода
-    model = AutoModelForCausalLM.from_pretrained("Salesforce/codegen-6B-multi")
+    tokenizer = AutoTokenizer.from_pretrained("bigcode/starcoder")  # Мощная модель для генерации кода
+    model = AutoModelForCausalLM.from_pretrained("bigcode/starcoder")
 except Exception as e:
     print(f"Ошибка при загрузке модели: {e}")
     model = None
@@ -36,7 +36,7 @@ def generate_text():
         if len(input_text) > 500:
             return jsonify({"error": "Слишком длинный текст, ограничение 500 символов"}), 400
 
-        # Подготовка данных для генерации с мощной моделью
+        # Подготовка данных для генерации с мощной моделью StarCoder
         inputs = tokenizer.encode(input_text, return_tensors="pt")
         attention_mask = torch.ones_like(inputs)
 
@@ -46,9 +46,9 @@ def generate_text():
                 attention_mask=attention_mask,
                 max_length=300,
                 num_return_sequences=1,
-                temperature=0.1,  # Низкая температура для точности
+                temperature=0.15,  # Очень низкая температура для точного кода
                 top_p=0.9,
-                top_k=40,
+                top_k=50,
                 no_repeat_ngram_size=3,
                 pad_token_id=tokenizer.eos_token_id
             )
