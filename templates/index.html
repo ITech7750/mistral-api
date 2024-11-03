@@ -6,35 +6,50 @@
     <title>MyGPT</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-components-web/4.0.0/material-components-web.min.css">
-    <!-- Подключение Prism.js CSS для подсветки синтаксиса -->
+    <!-- Prism.js CSS для подсветки синтаксиса -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism-tomorrow.min.css">
 </head>
 <body style="display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f0f2f5;">
     <div style="width: 400px; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
         <h2 style="text-align: center;">MyGPT</h2>
-        
+
+        <!-- Поле для ввода текста -->
         <div class="mdc-text-field mdc-text-field--textarea">
             <textarea id="inputText" class="mdc-text-field__input" rows="4" placeholder="Введите текст..."></textarea>
         </div>
-        
+
+        <!-- Выбор языка для подсветки -->
+        <label for="languageSelect">Выберите язык:</label>
+        <select id="languageSelect" style="width: 100%; margin-top: 8px;">
+            <option value="plaintext">По умолчанию</option>
+            <option value="python">Python</option>
+            <option value="javascript">JavaScript</option>
+            <option value="java">Java</option>
+            <option value="kotlin">Kotlin</option>
+        </select>
+
         <button id="generateButton" class="mdc-button mdc-button--raised" style="width: 100%; margin-top: 16px;">
             <span class="mdc-button__label">Сгенерировать</span>
         </button>
-        
+
         <div id="loadingMessage" style="display: none; text-align: center; color: gray; margin-top: 10px;">
             Генерация...
         </div>
-        
+
+        <!-- Блок для отображения результата с подсветкой -->
         <div id="response" style="display: none; margin-top: 20px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; background-color: #f9f9f9;">
             <strong>Ответ:</strong>
-            <pre><code id="responseText" class="language-python"></code></pre>
+            <pre><code id="responseText" class="language-plaintext"></code></pre>
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/material-components-web/4.0.0/material-components-web.min.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <!-- Подключение Prism.js для подсветки синтаксиса -->
+    <!-- Prism.js для подсветки синтаксиса -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-kotlin.min.js"></script>
 </body>
 </html>

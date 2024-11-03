@@ -66,33 +66,15 @@ def generate_text():
 def format_code(code: str) -> str:
     """Форматирует сгенерированный код для улучшения читабельности и сохранения отступов."""
     # Удаляем лишние пустые строки и нормализуем отступы
-    lines = code.split("\n")
+    lines = code.strip().split("\n")
     formatted_lines = [line.rstrip() for line in lines if line.strip()]
 
     # Определяем базовый отступ первой строки
     base_indent = len(re.match(r"^\s*", formatted_lines[0]).group(0))
-    formatted_lines = [
-        line[base_indent:] if len(line) >= base_indent else line
-        for line in formatted_lines
-    ]
-    
-    # Добавляем отступы для визуального разделения блоков
-    indent = "    "  # 4 пробела на уровень отступа
-    properly_indented_code = ""
-    current_indent_level = 0
+    formatted_lines = [line[base_indent:] if len(line) >= base_indent else line for line in formatted_lines]
 
-    for line in formatted_lines:
-        # Уменьшаем текущий отступ при закрытии блока
-        if re.match(r"^\s*(elif|else|except|finally|return|break|continue|pass|#)", line):
-            current_indent_level = max(current_indent_level - 1, 0)
-        
-        properly_indented_code += f"{indent * current_indent_level}{line}\n"
+    return "\n".join(formatted_lines)
 
-        # Увеличиваем отступ после строк, которые открывают новый блок
-        if re.match(r"^\s*(if|for|while|try|def|class|with)\b", line):
-            current_indent_level += 1
-
-    return properly_indented_code.strip()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)

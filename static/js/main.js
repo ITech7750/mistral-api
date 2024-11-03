@@ -6,9 +6,11 @@ document.addEventListener("DOMContentLoaded", function() {
     const responseText = document.getElementById("responseText");
     const responseContainer = document.getElementById("response");
     const loadingMessage = document.getElementById("loadingMessage");
+    const languageSelect = document.getElementById("languageSelect");
 
     generateButton.addEventListener("click", function() {
         const text = inputText.value.trim();
+        const selectedLanguage = languageSelect.value;  // Получение выбранного языка
 
         // Проверка на пустой или слишком длинный текст
         if (text.length === 0) {
@@ -43,8 +45,8 @@ document.addEventListener("DOMContentLoaded", function() {
             if (data.error) {
                 responseText.textContent = "Ошибка: " + data.error;
             } else {
-                // Обновление текста и языка для подсветки синтаксиса
-                responseText.className = 'language-python'; // Установите нужный язык подсветки, например 'language-javascript'
+                // Применение выбранного языка для подсветки
+                responseText.className = `language-${selectedLanguage}`;
                 responseText.textContent = data.response;
                 Prism.highlightElement(responseText); // Вызов подсветки синтаксиса
             }
