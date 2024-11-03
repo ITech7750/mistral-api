@@ -3,10 +3,9 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 import re
 
-# Инициализация модели и токенизатора
 try:
-    tokenizer = AutoTokenizer.from_pretrained("Salesforce/codegen-350M-multi")  # Модель для генерации кода
-    model = AutoModelForCausalLM.from_pretrained("Salesforce/codegen-350M-multi")
+    tokenizer = AutoTokenizer.from_pretrained("bigcode/starcoder", use_auth_token="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")
+    model = AutoModelForCausalLM.from_pretrained("bigcode/starcoder", use_auth_token="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")
 except Exception as e:
     print(f"Ошибка при загрузке модели: {e}")
     model = None
