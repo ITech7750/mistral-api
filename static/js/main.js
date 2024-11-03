@@ -1,3 +1,5 @@
+// static/js/main.js
+
 document.addEventListener("DOMContentLoaded", function() {
     const generateButton = document.getElementById("generateButton");
     const inputText = document.getElementById("inputText");
@@ -8,6 +10,7 @@ document.addEventListener("DOMContentLoaded", function() {
     generateButton.addEventListener("click", function() {
         const text = inputText.value.trim();
 
+        // Проверка на пустой или слишком длинный текст
         if (text.length === 0) {
             responseText.textContent = "Введите текст.";
             responseContainer.style.display = "block";
@@ -23,6 +26,7 @@ document.addEventListener("DOMContentLoaded", function() {
         responseContainer.style.display = "none";
         loadingMessage.style.display = "block";
 
+        // Отправка запроса на генерацию
         fetch("/generate", {
             method: "POST",
             headers: {
@@ -39,7 +43,10 @@ document.addEventListener("DOMContentLoaded", function() {
             if (data.error) {
                 responseText.textContent = "Ошибка: " + data.error;
             } else {
+                // Обновление текста и языка для подсветки синтаксиса
+                responseText.className = 'language-python'; // Установите нужный язык подсветки, например 'language-javascript'
                 responseText.textContent = data.response;
+                Prism.highlightElement(responseText); // Вызов подсветки синтаксиса
             }
             responseContainer.style.display = "block";
         })
