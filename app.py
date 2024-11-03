@@ -1,11 +1,12 @@
 from flask import Flask, request, jsonify, render_template
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
+import re
 
-# Инициализация модели StarCoder с токеном Hugging Face
+# Инициализация модели и токенизатора
 try:
-    tokenizer = AutoTokenizer.from_pretrained("bigcode/starcoder", use_auth_token="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")
-    model = AutoModelForCausalLM.from_pretrained("bigcode/starcoder", use_auth_token="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")
+    tokenizer = AutoTokenizer.from_pretrained("Salesforce/codegen-350M-multi")  # Модель для генерации кода
+    model = AutoModelForCausalLM.from_pretrained("Salesforce/codegen-350M-multi")
 except Exception as e:
     print(f"Ошибка при загрузке модели: {e}")
     model = None
@@ -35,7 +36,7 @@ def generate_text():
         if len(input_text) > 500:
             return jsonify({"error": "Слишком длинный текст, ограничение 500 символов"}), 400
 
-        # Подготовка данных для генерации с мощной моделью StarCoder
+        # Подготовка данных для генерации
         inputs = tokenizer.encode(input_text, return_tensors="pt")
         attention_mask = torch.ones_like(inputs)
 
@@ -43,31 +44,35 @@ def generate_text():
             outputs = model.generate(
                 inputs,
                 attention_mask=attention_mask,
-                max_length=300,
+                max_length=200,
                 num_return_sequences=1,
-                do_sample=True,  # Активируем выборку для применения temperature и top_p
-                temperature=0.15,
-                top_p=0.9,
+                temperature=0.2,
                 top_k=50,
+                top_p=0.95,
                 no_repeat_ngram_size=3,
                 pad_token_id=tokenizer.eos_token_id
             )
-
+        
         generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-
-        # Простое форматирование кода (удаление лишних пустых строк и нормализация отступов)
+        
+        # Форматирование кода с сохранением отступов
         formatted_text = format_code(generated_text)
-
+        
         return jsonify({"response": formatted_text})
 
     except Exception as e:
         return jsonify({"error": f"Ошибка: {e}"}), 500
 
 def format_code(code: str) -> str:
-    """Форматирует сгенерированный код для улучшения читаемости."""
-    # Убираем лишние пустые строки и нормализуем отступы
+    """Форматирует сгенерированный код для улучшения читабельности и сохранения отступов."""
+    # Удаляем лишние пустые строки и нормализуем отступы
     lines = code.split("\n")
     formatted_lines = [line.rstrip() for line in lines if line.strip()]
+
+    # Определяем базовый отступ первой строки
+    base_indent = len(re.match(r"^\s*", formatted_lines[0]).group(0))
+    formatted_lines = [line[base_indent:] if len(line) >= base_indent else line for line in formatted_lines]
+
     return "\n".join(formatted_lines)
 
 if __name__ == "__main__":
