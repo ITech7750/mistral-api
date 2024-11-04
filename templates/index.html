@@ -3,42 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto coding</title>
+    <title>Auto Coding</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-components-web/4.0.0/material-components-web.min.css">
-    <!-- Prism.js CSS для подсветки синтаксиса -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism-tomorrow.min.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f2f5;
+            font-family: 'Roboto', sans-serif;
+        }
+        .container {
+            width: 500px;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        h2 {
+            text-align: center;
+            font-weight: 500;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .mdc-text-field {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        .mdc-text-field__input {
+            font-size: 16px;
+            padding: 10px;
+        }
+        #languageSelect {
+            width: 100%;
+            font-size: 16px;
+            padding: 10px;
+            margin-top: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #generateButton {
+            width: 100%;
+            font-size: 18px;
+            padding: 15px 0;
+            background-color: #6200ea;
+            color: white;
+        }
+        #generateButton:hover {
+            background-color: #3700b3;
+        }
+        #loadingMessage {
+            text-align: center;
+            color: gray;
+            margin-top: 15px;
+            display: none;
+        }
+        #response {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        strong {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+    </style>
 </head>
-<body style="display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f0f2f5;">
-    <div style="width: 400px; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-        <h2 style="text-align: center;">Auto coding</h2>
-
-        <!-- Поле для ввода текста -->
+<body>
+    <div class="container">
+        <h2>Auto Coding</h2>
         <div class="mdc-text-field mdc-text-field--textarea">
-            <textarea id="inputText" class="mdc-text-field__input" rows="4" placeholder="Введите текст..."></textarea>
+            <textarea id="inputText" class="mdc-text-field__input" rows="6" placeholder="Введите текст..."></textarea>
         </div>
 
-        <!-- Выбор языка для подсветки -->
+        <!-- Language Selection -->
         <label for="languageSelect">Выберите язык:</label>
-        <select id="languageSelect" style="width: 100%; margin-top: 8px;">
+        <select id="languageSelect">
             <option value="plaintext">По умолчанию</option>
             <option value="python">Python</option>
             <option value="javascript">JavaScript</option>
             <option value="java">Java</option>
             <option value="kotlin">Kotlin</option>
             <option value="cpp">C++</option>
+            <option value="sql">SQL</option>
         </select>
 
-        <button id="generateButton" class="mdc-button mdc-button--raised" style="width: 100%; margin-top: 16px;">
+        <!-- Generate Button -->
+        <button id="generateButton" class="mdc-button mdc-button--raised">
             <span class="mdc-button__label">Сгенерировать</span>
         </button>
 
-        <div id="loadingMessage" style="display: none; text-align: center; color: gray; margin-top: 10px;">
-            Генерация...
-        </div>
+        <!-- Loading Message -->
+        <div id="loadingMessage">Генерация...</div>
 
-        <!-- Блок для отображения результата с подсветкой -->
-        <div id="response" style="display: none; margin-top: 20px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; background-color: #f9f9f9;">
+        <!-- Response Block -->
+        <div id="response">
             <strong>Ответ:</strong>
             <pre><code id="responseText" class="language-plaintext"></code></pre>
         </div>
@@ -46,13 +113,13 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/material-components-web/4.0.0/material-components-web.min.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <!-- Prism.js для подсветки синтаксиса -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-python.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-javascript.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-java.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-kotlin.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-cpp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-sql.min.js"></script>
 
     <script>
         document.getElementById("generateButton").addEventListener("click", function() {
@@ -61,11 +128,9 @@
             const responseElement = document.getElementById("response");
             const responseTextElement = document.getElementById("responseText");
 
-            // Очистка предыдущего результата и установка языка
             responseTextElement.className = `language-${language}`;
             responseTextElement.textContent = inputText; // Пример вывода, замените на сгенерированный текст
 
-            // Вызов Prism.js для подсветки синтаксиса
             Prism.highlightElement(responseTextElement);
             responseElement.style.display = "block";
         });
